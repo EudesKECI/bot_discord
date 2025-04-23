@@ -67,5 +67,5 @@ async def on_member_remove(member):
     await salon.send(f"😢 {member.mention} a quitté le serveur...")
 
 
-# keep_alive()
+keep_alive()
 bot.run(token=token)
