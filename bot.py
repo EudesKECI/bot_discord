@@ -15,6 +15,10 @@ SALON_CIBLE_ID = 1364577267312754769  # ID du salon sur le serveur B
 message_map = {}
 
 @bot.event
+async def on_ready():
+     print(f"===== Bot connecté en tant que {bot.user} =====")
+
+@bot.event
 async def on_message(message):
     if message.author.bot:
         return
@@ -24,9 +28,17 @@ async def on_message(message):
 
         contenu = f"**{message.author.display_name}** : {message.content}"
         fichiers = [await f.to_file() for f in message.attachments]
-
         msg_envoye = await salon_cible.send(content=contenu, files=fichiers)
+        # On enregistre les ID des messages
+        message_map[message.id] = msg_envoye.id
 
+        """Inversemment"""
+
+    elif message.channel.id == SALON_CIBLE_ID:
+        salon_source = bot.get_channel(SALON_SOURCE_ID)
+        contenu = f"**{message.author.display_name}** : {message.content}"
+        fichiers = [await f.to_file() for f in message.attachments]
+        msg_envoye = await salon_source.send(content=contenu, files=fichiers)
         # On enregistre les ID des messages
         message_map[message.id] = msg_envoye.id
 
@@ -42,42 +54,9 @@ async def on_message_delete(message):
         except discord.NotFound:
             pass  # Le message a déjà été supprimé
 
-@bot.event
-async def on_message_edit(before, after):
-    if before.channel.id == SALON_SOURCE_ID and before.id in message_map:
-        salon_cible = bot.get_channel(SALON_CIBLE_ID)
-        id_message_cible = message_map[before.id]
-
-        contenu = f" **{after.author.display_name}** (édité) : {after.content}"
-        fichiers = [await f.to_file() for f in after.attachments]
-
-        try:
-            msg_a_modifier = await salon_cible.fetch_message(id_message_cible)
-            await msg_a_modifier.edit(content=contenu)
-        except discord.NotFound:
-            pass  # Si le message n'existe plus
-
-
         """Inversemment"""
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
 
-    if message.channel.id == SALON_CIBLE_ID:
-        salon_source = bot.get_channel(SALON_SOURCE_ID)
-
-        contenu = f"**{message.author.display_name}** : {message.content}"
-        fichiers = [await f.to_file() for f in message.attachments]
-
-        msg_envoye = await salon_source.send(content=contenu, files=fichiers)
-
-        # On enregistre les ID des messages
-        message_map[message.id] = msg_envoye.id
-
-@bot.event
-async def on_message_delete(message):
-    if message.channel.id == SALON_CIBLE_ID and message.id in message_map:
+    elif message.channel.id == SALON_CIBLE_ID and message.id in message_map:
         salon_source = bot.get_channel(SALON_SOURCE_ID)
         id_message_source = message_map[message.id]
 
@@ -87,20 +66,35 @@ async def on_message_delete(message):
         except discord.NotFound:
             pass  # Le message a déjà été supprimé
 
+
 @bot.event
 async def on_message_edit(before, after):
-    if before.channel.id == SALON_CIBLE_ID and before.id in message_map:
+    if before.channel.id == SALON_SOURCE_ID and before.id in message_map:
+        salon_cible = bot.get_channel(SALON_CIBLE_ID)
+        id_message_cible = message_map[before.id]
+
+        contenu = f" **{after.author.display_name}** (édité) : {after.content}"
+        # fichiers = [await f.to_file() for f in after.attachments]
+        try:
+            msg_a_modifier = await salon_cible.fetch_message(id_message_cible)
+            await msg_a_modifier.edit(content=contenu)
+        except discord.NotFound:
+            pass  # Si le message n'existe plus
+
+        """Inversemment"""
+
+    elif before.channel.id == SALON_CIBLE_ID and before.id in message_map:
         salon_source = bot.get_channel(SALON_SOURCE_ID)
         id_message_source = message_map[before.id]
 
         contenu = f" **{after.author.display_name}** (édité) : {after.content}"
-        fichiers = [await f.to_file() for f in after.attachments]
-
+        # fichiers = [await f.to_file() for f in after.attachments]
         try:
             msg_a_modifier = await salon_source.fetch_message(id_message_source)
             await msg_a_modifier.edit(content=contenu)
         except discord.NotFound:
             pass  # Si le message n'existe plus
+
 
 """Méssage de bienvenue et d'au revoir"""
 SALON_ARRIVANT_ID = 1356747693266833630
