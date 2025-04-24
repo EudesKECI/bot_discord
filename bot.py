@@ -102,18 +102,18 @@ async def on_message_edit(before, after):
         except discord.NotFound:
             pass  # Si le message n'existe plus
 
-# """Méssage de bienvenue et d'au revoir"""
-# SALON_ARRIVANT_ID = 1356747693266833630
-# @bot.event
-# async def on_member_join(member):
-#     salon = bot.get_channel(SALON_ARRIVANT_ID)
-#     await salon.send(f"👋 Bienvenue {member.mention} sur le serveur !")
+"""Méssage de bienvenue et d'au revoir"""
+SALON_ARRIVANT_ID = 1356747693266833630
+@bot.event
+async def on_member_join(member):
+    salon = bot.get_channel(SALON_ARRIVANT_ID)
+    await salon.send(f"👋 Bienvenue {member.mention} sur le serveur !")
 
-# SALON_SORTANT_ID = 1356747731519012925
-# @bot.event
-# async def on_member_remove(member):
-#     salon = bot.get_channel(SALON_SORTANT_ID)
-#     await salon.send(f"😢 {member.mention} a quitté le serveur...")
+SALON_SORTANT_ID = 1356747731519012925
+@bot.event
+async def on_member_remove(member):
+    salon = bot.get_channel(SALON_SORTANT_ID)
+    await salon.send(f"😢 {member.mention} a quitté le serveur...")
 
 
 keep_alive()
